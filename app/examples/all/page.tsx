@@ -3,11 +3,10 @@
 import React, { useState } from "react";
 import styles from "./page.module.css";
 import Chat from "../../components/chat";
-import WeatherWidget from "../../components/weather-widget";
-import { getWeather } from "../../utils/weather";
 import { getCompanies } from "@/app/utils/companies";
+import { fetchTransactions } from "@/app/utils/transactions";
+import { humanQueryToSQL } from "@/app/utils/humanQueryToSQL";
 import { fetchOpportunities } from "../../utils/opportunities";
-import FileViewer from "../../components/file-viewer";
 import CompanyWidget from "@/app/components/company-widget";
 
 const FunctionCalling = () => {
@@ -17,7 +16,7 @@ const FunctionCalling = () => {
   const clearStates = () => {
     // setWeatherData({});
     setCompaniesData([]);
-  }
+  };
 
   const functionCallHandler = async (call) => {
     if (!call?.function?.name)
@@ -25,18 +24,36 @@ const FunctionCalling = () => {
     clearStates();
     const args = JSON.parse(call.function.arguments);
 
-    if (call.function.name === "get_weather") {
-      const data = getWeather(args.location);
-      setWeatherData(data);
-      return JSON.stringify(data);
+    if (call.function.name === "database_query_builder") {
+      try {
+        const sqlQuery = await humanQueryToSQL({
+          humanQuery: args.humanQuery as string,
+        });
+
+        return sqlQuery;
+      } catch (error) {
+        console.error("Error fetching opportunities:", error);
+        return JSON.stringify({
+          error: "No se pudieron obtener oportunidades",
+        });
+      }
     }
 
-    if (call.function.name === "get_companies") {
-      const data = await getCompanies();
-      console.log("companies", data);
-      // @ts-ignore
-      setCompaniesData(data);
-      return JSON.stringify(data);
+    if (call.function.name === "query_transacciones") {
+      try {
+        const data = await fetchTransactions({ ...args });
+
+        if (!data || data.length === 0) {
+          throw new Error("No se encontraron oportunidades");
+        }
+
+        return JSON.stringify(data);
+      } catch (error) {
+        console.error("Error fetching opportunities:", error);
+        return JSON.stringify({
+          error: "No se pudieron obtener oportunidades",
+        });
+      }
     }
 
     if (call.function.name === "search_properties") {
@@ -71,11 +88,13 @@ const FunctionCalling = () => {
   return (
     <main className={styles.main}>
       <div className={styles.container}>
-        {companiesData.length > 0 && <div className={styles.column}>
-          {/* <WeatherWidget {...weatherData} /> */}
-          {/* <FileViewer /> */}
-          <CompanyWidget companies={companiesData} />
-        </div>}
+        {companiesData.length > 0 && (
+          <div className={styles.column}>
+            {/* <WeatherWidget {...weatherData} /> */}
+            {/* <FileViewer /> */}
+            <CompanyWidget companies={companiesData} />
+          </div>
+        )}
 
         <div className={styles.chatContainer}>
           <div className={styles.chat}>

@@ -1,0 +1,79 @@
+{
+    "name": "query_transacciones",
+    "description": "Get transactions data using filters.",
+    "parameters": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "buyer": {
+          "type": "string",
+          "description": "One or more buyers separated by '|'."
+        },
+        "seller": {
+          "type": "string",
+          "description": "One or more sellers separated by '|'."
+        },
+        "assettype": {
+          "type": "string",
+          "description": "One or more asset types separated by '|'. Possible values: `Residential`, `Urban/Developer Plots`, `Office`, `Other`, `Shopping Centre`, `Retail`, `Hotel`, `Portfolio`, `Seniors Housing & Care`, `Parking`, `Logistic`, `Student residence`."
+        },
+        "transactiontype": {
+          "type": "string",
+          "description": "One or more asset types separated by '|'. Possible values: `1. Sale`, `2. Negotiation`, `8. Sale&Leaseback`, `11. Build to Rent`, `12. Auction`, `13. Turn key project`, `14. Expropriation`."
+        },
+        "afterdate": {
+          "type": "string",
+          "description": "Transactions dated on or after the specified date. Date format: yyyy-mm-dd"
+        },
+        "beforedate": {
+          "type": "string",
+          "description": "Transactions dated on or before the specified date."
+        },
+        "maximumvalue": {
+          "type": "integer",
+          "description": "Transactions where final_price is less than specified value."
+        },
+        "minimumvalue": {
+          "type": "integer",
+          "description": "Transactions where final_price greater than specified value."
+        },
+        "district": {
+          "type": "string",
+          "description": "District where the transaction took place."
+        },
+        "m30": {
+          "type": "integer",
+          "description": "M30 value related to the transaction."
+        },
+        "municipality": {
+          "type": "string",
+          "description": "Municipality where the transaction took place."
+        },
+        "neighborhood": {
+          "type": "string",
+          "description": "Neighborhood where the transaction took place."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+
+
+  {
+    "name": "query_transacciones",
+    "description": "Executes an SQL query on the transactions table ('afflux_transacciones_mv').",
+    "strict": true,
+    "parameters": {
+      "type": "object",
+      "required": [
+        "query"
+      ],
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The SQL query to be executed."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
