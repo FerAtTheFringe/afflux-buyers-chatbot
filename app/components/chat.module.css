@@ -36,7 +36,8 @@
 
 .button {
   padding: 8px 24px;
-  background-color: #000;
+  /* background-color: #000; */
+  background: linear-gradient(135deg, #0F172A, #1E40AF, #3B82F6);;
   color: white;
   border: none;
   font-size: 1em;
