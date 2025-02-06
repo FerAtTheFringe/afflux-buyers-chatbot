@@ -8,6 +8,7 @@ import { fetchTransactions } from "@/app/utils/transactions";
 import { humanQueryToSQL } from "@/app/utils/humanQueryToSQL";
 import { fetchOpportunities } from "../../utils/opportunities";
 import CompanyWidget from "@/app/components/company-widget";
+import { fetchLicenses } from "@/app/utils/licenses";
 
 const FunctionCalling = () => {
   const [weatherData, setWeatherData] = useState({});
@@ -42,6 +43,23 @@ const FunctionCalling = () => {
     if (call.function.name === "query_transacciones") {
       try {
         const data = await fetchTransactions({ ...args });
+
+        if (!data || data.length === 0) {
+          throw new Error("No se encontraron oportunidades");
+        }
+
+        return JSON.stringify(data);
+      } catch (error) {
+        console.error("Error fetching opportunities:", error);
+        return JSON.stringify({
+          error: "No se pudieron obtener oportunidades",
+        });
+      }
+    }
+
+    if (call.function.name === "query_licencias") {
+      try {
+        const data = await fetchLicenses({ ...args });
 
         if (!data || data.length === 0) {
           throw new Error("No se encontraron oportunidades");

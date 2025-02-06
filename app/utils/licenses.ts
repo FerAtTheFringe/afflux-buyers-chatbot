@@ -1,6 +1,37 @@
-export async function fetchLicenses() {
+export async function fetchLicenses(params) {
   try {
-    const response = await fetch("/api/licenses", {
+    const queryParams = new URLSearchParams();
+
+    const optionalParams = [
+      "q",
+      "afterdate",
+      "beforedate",
+      "district",
+      "m30",
+      "municipality",
+      "neighborhood",
+      "operation",
+      "promotor",
+      "residentialtypology",
+    ];
+
+    console.log("PARAMS", params);
+
+    optionalParams.forEach((param) => {
+      const values = params[param];
+      if (values) {
+        if (Array.isArray(values)) {
+          values.forEach((value) => queryParams.append(param, value));
+        } else {
+          queryParams.append(param, values);
+        }
+      }
+    });
+
+    const queryString = queryParams.toString();
+    const url = `/api/licenses${queryString ? `?${queryString}` : ""}`;
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -12,6 +43,8 @@ export async function fetchLicenses() {
     }
 
     const json = await response.json();
+    console.log("Licencias", json.data);
+
     return json.data;
   } catch (error) {
     console.error("Error en fetchLicenses:", error);
