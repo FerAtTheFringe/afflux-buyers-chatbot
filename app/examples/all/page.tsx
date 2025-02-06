@@ -9,6 +9,7 @@ import { humanQueryToSQL } from "@/app/utils/humanQueryToSQL";
 import { fetchOpportunities } from "../../utils/opportunities";
 import CompanyWidget from "@/app/components/company-widget";
 import { fetchLicenses } from "@/app/utils/licenses";
+import { fetchWebSearch } from "@/app/utils/websearch";
 
 const FunctionCalling = () => {
   const [weatherData, setWeatherData] = useState({});
@@ -70,6 +71,19 @@ const FunctionCalling = () => {
         console.error("Error fetching licenses:", error);
         return JSON.stringify({
           error: "No se pudieron obtener licencias",
+        });
+      }
+    }
+
+    if (call.function.name === "web_search") {
+      try {
+        const data = await fetchWebSearch({ ...args });
+
+        return JSON.stringify(data);
+      } catch (error) {
+        console.error("Error fetching web search:", error);
+        return JSON.stringify({
+          error: "No se pudieron obtener datos de la web",
         });
       }
     }

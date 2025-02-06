@@ -24,6 +24,8 @@ const FetchingLoader = ({
         return "transacciones";
       case "query_licencias":
         return "licencias";
+      case "web_search":
+        return "resultados de Google";
       default:
         return "datos";
     }
