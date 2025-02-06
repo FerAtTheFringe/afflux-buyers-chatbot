@@ -44,8 +44,8 @@ export async function fetchLicenses(params) {
 
     const json = await response.json();
     console.log("Licencias", json.data);
-
-    return json.data;
+    // SLICED to avoid large responses error
+    return json.data.slice(0, 180);
   } catch (error) {
     console.error("Error en fetchLicenses:", error);
     throw error;

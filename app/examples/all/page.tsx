@@ -33,9 +33,9 @@ const FunctionCalling = () => {
 
         return sqlQuery;
       } catch (error) {
-        console.error("Error fetching opportunities:", error);
+        console.error("Error querying database:", error);
         return JSON.stringify({
-          error: "No se pudieron obtener oportunidades",
+          error: "No se pudo obtener la query SQL",
         });
       }
     }
@@ -45,14 +45,14 @@ const FunctionCalling = () => {
         const data = await fetchTransactions({ ...args });
 
         if (!data || data.length === 0) {
-          throw new Error("No se encontraron oportunidades");
+          throw new Error("No se encontraron transacciones");
         }
 
         return JSON.stringify(data);
       } catch (error) {
-        console.error("Error fetching opportunities:", error);
+        console.error("Error fetching transactions:", error);
         return JSON.stringify({
-          error: "No se pudieron obtener oportunidades",
+          error: "No se pudieron obtener transacciones",
         });
       }
     }
@@ -62,14 +62,14 @@ const FunctionCalling = () => {
         const data = await fetchLicenses({ ...args });
 
         if (!data || data.length === 0) {
-          throw new Error("No se encontraron oportunidades");
+          throw new Error("No se encontraron licencias");
         }
 
         return JSON.stringify(data);
       } catch (error) {
-        console.error("Error fetching opportunities:", error);
+        console.error("Error fetching licenses:", error);
         return JSON.stringify({
-          error: "No se pudieron obtener oportunidades",
+          error: "No se pudieron obtener licencias",
         });
       }
     }

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "./chat.module.css";
 import { AssistantStream } from "openai/lib/AssistantStream";
 import { ToastContainer, toast, Bounce } from "react-toastify";
-import Markdown from "react-markdown";
+import ReactMarkdown from "react-markdown";
 // @ts-expect-error - no types for this yet
 import { AssistantStreamEvent } from "openai/resources/beta/assistants/assistants";
 import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs";
@@ -22,7 +22,17 @@ const UserMessage = ({ text }: { text: string }) => {
 const AssistantMessage = ({ text }: { text: string }) => {
   return (
     <div className={styles.assistantMessage}>
-      <Markdown>{text}</Markdown>
+      <ReactMarkdown
+        components={{
+          a: ({ node, ...props }) => (
+            <a {...props} target="_blank" rel="noopener noreferrer">
+              {props.children}
+            </a>
+          ),
+        }}
+      >
+        {text}
+      </ReactMarkdown>
     </div>
   );
 };
@@ -66,6 +76,7 @@ const Chat = ({
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [fetching, setFetching] = useState(false);
+  const [dataResource, setDataResource] = useState("");
   const [threadId, setThreadId] = useState("");
 
   // automatically scroll to bottom of chat
@@ -194,6 +205,7 @@ const Chat = ({
     // loop over tool calls and call function handler
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall) => {
+        setDataResource(toolCall.function.name);
         const result = await functionCallHandler(toolCall);
         return { output: result, tool_call_id: toolCall.id };
       })
@@ -272,7 +284,7 @@ const Chat = ({
         {messages.map((msg, index) => (
           <Message key={index} role={msg.role} text={msg.text} />
         ))}
-        {<FetchingLoader fetching={fetching} />}
+        {<FetchingLoader fetching={fetching} dataResource={dataResource} />}
         <div ref={messagesEndRef} />
       </div>
       <form
