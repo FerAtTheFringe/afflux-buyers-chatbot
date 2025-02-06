@@ -66,6 +66,7 @@ const Chat = ({
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [fetching, setFetching] = useState(false);
+  const [dataResource, setDataResource] = useState("");
   const [threadId, setThreadId] = useState("");
 
   // automatically scroll to bottom of chat
@@ -194,6 +195,7 @@ const Chat = ({
     // loop over tool calls and call function handler
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall) => {
+        setDataResource(toolCall.function.name);
         const result = await functionCallHandler(toolCall);
         return { output: result, tool_call_id: toolCall.id };
       })
@@ -272,7 +274,7 @@ const Chat = ({
         {messages.map((msg, index) => (
           <Message key={index} role={msg.role} text={msg.text} />
         ))}
-        {<FetchingLoader fetching={fetching} />}
+        {<FetchingLoader fetching={fetching} dataResource={dataResource} />}
         <div ref={messagesEndRef} />
       </div>
       <form
