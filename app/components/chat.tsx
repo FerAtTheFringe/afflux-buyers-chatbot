@@ -13,13 +13,20 @@ import FetchingLoader from "./fetching-loader";
 type MessageProps = {
   role: "user" | "assistant" | "code";
   text: string;
+  source?: string;
 };
 
 const UserMessage = ({ text }: { text: string }) => {
   return <div className={styles.userMessage}>{text}</div>;
 };
 
-const AssistantMessage = ({ text }: { text: string }) => {
+const AssistantMessage = ({
+  text,
+  source,
+}: {
+  text: string;
+  source: string;
+}) => {
   return (
     <div className={styles.assistantMessage}>
       <ReactMarkdown
@@ -33,6 +40,11 @@ const AssistantMessage = ({ text }: { text: string }) => {
       >
         {text}
       </ReactMarkdown>
+      {source && (
+        <small className={styles.source}>{`Fuente: datos ${
+          source === "web_search" ? "externos" : "internos"
+        }`}</small>
+      )}
     </div>
   );
 };
@@ -50,12 +62,12 @@ const CodeMessage = ({ text }: { text: string }) => {
   );
 };
 
-const Message = ({ role, text }: MessageProps) => {
+const Message = ({ role, text, source }: MessageProps) => {
   switch (role) {
     case "user":
       return <UserMessage text={text} />;
     case "assistant":
-      return <AssistantMessage text={text} />;
+      return <AssistantMessage text={text} source={source} />;
     case "code":
       return <CodeMessage text={text} />;
     default:
@@ -122,7 +134,7 @@ const Chat = ({
     handleReadableStream(stream);
   };
 
-  const submitActionResult = async (runId, toolCallOutputs) => {
+  const submitActionResult = async (runId, toolCallOutputs, source) => {
     try {
       const response = await fetch(
         `/api/assistants/threads/${threadId}/actions`,
@@ -140,7 +152,7 @@ const Chat = ({
 
       setFetching(false);
       const stream = AssistantStream.fromReadableStream(response.body);
-      handleReadableStream(stream);
+      handleReadableStream(stream, source);
     } catch (error) {
       setFetching(false);
       toast.error("Error procesando datos");
@@ -202,16 +214,18 @@ const Chat = ({
     const runId = event.data.id;
     const toolCalls = event.data.required_action.submit_tool_outputs.tool_calls;
     setFetching(true);
+    let source;
     // loop over tool calls and call function handler
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall) => {
-        setDataResource(toolCall.function.name);
+        source = toolCall.function.name;
+        setDataResource(source);
         const result = await functionCallHandler(toolCall);
         return { output: result, tool_call_id: toolCall.id };
       })
     );
     setInputDisabled(true);
-    submitActionResult(runId, toolCallOutputs);
+    submitActionResult(runId, toolCallOutputs, source);
   };
 
   // handleRunCompleted - re-enable the input form
@@ -219,7 +233,7 @@ const Chat = ({
     setInputDisabled(false);
   };
 
-  const handleReadableStream = (stream: AssistantStream) => {
+  const handleReadableStream = (stream: AssistantStream, source = "") => {
     // messages
     stream.on("textCreated", handleTextCreated);
     stream.on("textDelta", handleTextDelta);
@@ -235,7 +249,10 @@ const Chat = ({
     stream.on("event", (event) => {
       if (event.event === "thread.run.requires_action")
         handleRequiresAction(event);
-      if (event.event === "thread.run.completed") handleRunCompleted();
+      if (event.event === "thread.run.completed") {
+        handleRunCompleted();
+        appendSourceToLastMessage(source);
+      }
     });
   };
 
@@ -244,6 +261,17 @@ const Chat = ({
     === Utility Helpers ===
     =======================
   */
+
+  const appendSourceToLastMessage = (source: string) => {
+    setMessages((prevMessages) => {
+      const lastMessage = prevMessages[prevMessages.length - 1];
+      const updatedLastMessage = {
+        ...lastMessage,
+        source,
+      };
+      return [...prevMessages.slice(0, -1), updatedLastMessage];
+    });
+  };
 
   const appendToLastMessage = (text) => {
     setMessages((prevMessages) => {
@@ -281,9 +309,16 @@ const Chat = ({
   return (
     <div className={styles.chatContainer}>
       <div className={styles.messages}>
-        {messages.map((msg, index) => (
-          <Message key={index} role={msg.role} text={msg.text} />
-        ))}
+        {messages.map((msg, index) => {
+          return (
+            <Message
+              key={index}
+              role={msg.role}
+              text={msg.text}
+              source={msg.source}
+            />
+          );
+        })}
         {<FetchingLoader fetching={fetching} dataResource={dataResource} />}
         <div ref={messagesEndRef} />
       </div>
