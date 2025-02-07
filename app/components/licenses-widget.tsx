@@ -19,37 +19,24 @@ const LicensesWidget = ({ licenses = [] }) => {
   );
 
   const downloadCSV = () => {
+    if (filteredLicenses.length === 0) {
+      alert("No hay transacciones para exportar.");
+      return;
+    }
+  
+    // Obtener todas las claves únicas de los objetos en filteredLicenses
+    const allKeys = Array.from(
+      new Set(filteredLicenses.flatMap(transaction => Object.keys(transaction)))
+    );
+  
+    // Construir contenido del CSV
     const csvContent = [
-      [
-        "Fecha",
-        "Link",
-        "Tipo de transacción",
-        "Tipo de propiedad",
-        "Descripción",
-        "Comprador",
-        "Vendedor",
-        "Ciudad",
-        "Dirección",
-        "M30",
-        "Precio Final",
-      ],
-      ...licenses.map((transaction) => [
-        transaction["TRANSACCIONES.source_date"],
-        transaction["TRANSACCIONES.brainsre_news_es"],
-        transaction["TRANSACCIONES.transaction_type"],
-        transaction["TRANSACCIONES.asset_type"],
-        transaction["TRANSACCIONES.property_description"],
-        transaction["TRANSACCIONES.buyer"],
-        transaction["TRANSACCIONES.seller"],
-        transaction["TRANSACCIONES.municipality"],
-        transaction["TRANSACCIONES.address"],
-        transaction["AUX.m30"] ? "Sí" : "No",
-        transaction["TRANSACCIONES.final_value"],
-      ]),
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
-
+      allKeys.join(","), // Cabeceras
+      ...filteredLicenses.map(transaction =>
+        allKeys.map(key => transaction[key] ?? "N/A").join(",") // Filas
+      )
+    ].join("\n");
+  
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -58,7 +45,7 @@ const LicensesWidget = ({ licenses = [] }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
+  };  
 
   return (
     <div
