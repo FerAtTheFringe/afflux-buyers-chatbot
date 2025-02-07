@@ -1,0 +1,48 @@
+{
+  "name": "query_licencias",
+  "description": "Query licenses with specific filters based on transaction dates and geographical parameters.",
+  "strict": false,
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "afterdate": {
+        "type": "string",
+        "description": "Transactions dated on or after"
+      },
+      "beforedate": {
+        "type": "string",
+        "description": "Transactions dated on or before"
+      },
+      "district": {
+        "type": "string",
+        "description": "District filter"
+      },
+      "m30": {
+        "type": "integer",
+        "description": "Integer filter for m30"
+      },
+      "municipality": {
+        "type": "string",
+        "description": "Municipality filter"
+      },
+      "neighborhood": {
+        "type": "string",
+        "description": "Neighborhood filter"
+      },
+      "operation": {
+        "type": "string",
+        "description": "One or more works separated by '|'"
+      },
+      "promotor": {
+        "type": "string",
+        "description": "One or more promotors separated by '|'"
+      },
+      "residentialtypology": {
+        "type": "string",
+        "description": "One or more residential types separated by '|'. Possible values: `Only Apartments`, `Only Houses`, `Only VPO`, `Apartments & VPO`, `Apartments & Houses`, `Non-Resi`, `Hotel`, `Houses & VPO`, `Apartments & Houses & VPO`"
+      }
+    },
+    "additionalProperties": false,
+    "required": []
+  }
+}
