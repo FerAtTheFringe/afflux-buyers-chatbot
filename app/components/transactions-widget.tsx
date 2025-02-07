@@ -68,7 +68,7 @@ const TransactionsWidget = ({ transactions = [] }) => {
     >
       <div className={styles.columnTitle}>
         <h1>Transacciones</h1>
-        <small className={styles.resultsAmount}>
+        <small>
           {filteredTransactions.length} resultados
         </small>
       </div>
