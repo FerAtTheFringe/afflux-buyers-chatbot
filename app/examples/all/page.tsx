@@ -3,20 +3,20 @@
 import React, { useState } from "react";
 import styles from "./page.module.css";
 import Chat from "../../components/chat";
-import { getCompanies } from "@/app/utils/companies";
 import { fetchTransactions } from "@/app/utils/transactions";
 import { humanQueryToSQL } from "@/app/utils/humanQueryToSQL";
 import { fetchOpportunities } from "../../utils/opportunities";
-import CompanyWidget from "@/app/components/company-widget";
 import { fetchLicenses } from "@/app/utils/licenses";
+import TransactionsWidget from "@/app/components/transactions-widget";
 
 const FunctionCalling = () => {
-  const [weatherData, setWeatherData] = useState({});
-  const [companiesData, setCompaniesData] = useState([]);
+  const [transactionsData, setTransactionsData] = useState([]);
+  const [licensesData, setLicensesData] = useState([]);
+  const showColumn = transactionsData.length > 0 || licensesData.length > 0;
 
   const clearStates = () => {
-    // setWeatherData({});
-    setCompaniesData([]);
+    setTransactionsData([]);
+    setLicensesData([]);
   };
 
   const functionCallHandler = async (call) => {
@@ -44,11 +44,11 @@ const FunctionCalling = () => {
       try {
         const data = await fetchTransactions({ ...args });
 
-        if (!data || data.length === 0) {
+        if (!data) {
           throw new Error("No se encontraron transacciones");
         }
-
-        return JSON.stringify(data);
+        setTransactionsData(data);
+        return JSON.stringify(data.slice(0, 235));
       } catch (error) {
         console.error("Error fetching transactions:", error);
         return JSON.stringify({
@@ -61,11 +61,11 @@ const FunctionCalling = () => {
       try {
         const data = await fetchLicenses({ ...args });
 
-        if (!data || data.length === 0) {
+        if (!data) {
           throw new Error("No se encontraron licencias");
         }
-
-        return JSON.stringify(data);
+        setLicensesData(data);
+        return JSON.stringify(data.slice(0, 180));
       } catch (error) {
         console.error("Error fetching licenses:", error);
         return JSON.stringify({
@@ -106,11 +106,9 @@ const FunctionCalling = () => {
   return (
     <main className={styles.main}>
       <div className={styles.container}>
-        {companiesData.length > 0 && (
+        {showColumn && (
           <div className={styles.column}>
-            {/* <WeatherWidget {...weatherData} /> */}
-            {/* <FileViewer /> */}
-            <CompanyWidget companies={companiesData} />
+            {transactionsData && <TransactionsWidget transactions={transactionsData} />}
           </div>
         )}
 
