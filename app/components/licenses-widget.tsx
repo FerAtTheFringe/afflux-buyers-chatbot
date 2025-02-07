@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import styles from "./transactions-widget.module.css";
+import styles from "./licenses-widget.module.css";
 
-const formatFinalValue = (value) => {
+const formatStringPrice = (value: string) => {
   if (!value) return "N/A";
   const numberValue = parseFloat(value);
   return isNaN(numberValue) ? value : numberValue.toLocaleString("es-ES");
 };
 
-const TransactionsWidget = ({ transactions = [] }) => {
+const LicensesWidget = ({ licenses = [] }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewJson, setViewJson] = useState(false);
-  const show = transactions.length > 0;
+  const show = licenses.length > 0;
 
-  const filteredTransactions = transactions.filter((transaction) =>
-    (transaction["TRANSACCIONES.buyer"]?.toLowerCase() ?? "").includes(
+  const filteredLicenses = licenses.filter((transaction) =>
+    (transaction["LICENCIAS.obra"]?.toLowerCase() ?? "").includes(
       searchQuery.toLowerCase()
     )
   );
@@ -33,7 +33,7 @@ const TransactionsWidget = ({ transactions = [] }) => {
         "M30",
         "Precio Final",
       ],
-      ...transactions.map((transaction) => [
+      ...licenses.map((transaction) => [
         transaction["TRANSACCIONES.source_date"],
         transaction["TRANSACCIONES.brainsre_news_es"],
         transaction["TRANSACCIONES.transaction_type"],
@@ -67,10 +67,8 @@ const TransactionsWidget = ({ transactions = [] }) => {
       }`}
     >
       <div className={styles.columnTitle}>
-        <h1>Transacciones</h1>
-        <small>
-          {filteredTransactions.length} resultados
-        </small>
+        <h1>Licencias</h1>
+        <small>{filteredLicenses.length} resultados</small>
       </div>
 
       <div className={`${styles.inputForm} ${styles.clearfix}`}>
@@ -79,7 +77,7 @@ const TransactionsWidget = ({ transactions = [] }) => {
           className={styles.input}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Buscar por comprador"
+          placeholder="Buscar por obra"
         />
         <div className={styles.chatControls}>
           <button
@@ -96,80 +94,50 @@ const TransactionsWidget = ({ transactions = [] }) => {
       </div>
       {viewJson ? (
         <pre className={styles.jsonView}>
-          {JSON.stringify(filteredTransactions, null, 2)}
+          {JSON.stringify(filteredLicenses, null, 2)}
         </pre>
       ) : (
         <div className={styles.companyDetails}>
-          {filteredTransactions.map((transaction, index) => {
-            const transactionType =
-              transaction["TRANSACCIONES.transaction_type"];
-            const transactionTypeFormatted = transactionType
-              ? transactionType.split(" ")[1]
-              : "";
-            return (
-              <div key={index} className={styles.companyCard}>
-                <div className={styles.companyCardHeader}>
-                  <h2>
-                    {transactionTypeFormatted} -{" "}
-                    {transaction["TRANSACCIONES.asset_type"]}
-                  </h2>
-                  <h4>
-                    {transaction["TRANSACCIONES.source_date"]} | €
-                    {formatFinalValue(transaction["TRANSACCIONES.final_value"])}
-                  </h4>
-                </div>
-
-                <p>
-                  {transaction["TRANSACCIONES.property_description"] || "N/A"}
-                </p>
-
-                <table className={styles.saleTable}>
-                  <thead>
-                    <tr>
-                      <th>Compra</th>
-                      <th>Vende</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{transaction["TRANSACCIONES.buyer"] || "N/A"}</td>
-                      <td>{transaction["TRANSACCIONES.seller"] || "N/A"}</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                <div className={styles.attribute}>
-                  <img className={styles.icon} src="/location.svg" />{" "}
-                  <p>
-                    <strong>
-                      {transaction["TRANSACCIONES.municipality"] || "N/A"}.
-                    </strong>{" "}
-                    {transaction["TRANSACCIONES.address"] || "N/A"}.{" "}
-                    <strong>
-                      {transaction["AUX.m30"] ? "Dentro" : "Fuera"} de M30.
-                    </strong>
-                  </p>
-                </div>
-                {/* <p>
-                  <strong>M30:</strong> {transaction["AUX.m30"] ? "Sí" : "No"}
-                </p> */}
-                {transaction["TRANSACCIONES.brainsre_news_es"] && (
-                  <a
-                    href={transaction["TRANSACCIONES.brainsre_news_es"]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.linkButton}
-                  >
-                    Ver noticia
-                  </a>
-                )}
+          {filteredLicenses.map((license, index) => (
+            <div key={index} className={styles.companyCard}>
+              <div className={styles.companyCardHeader}>
+                <h2>{license["LICENCIAS.developer"] || "N/A"}</h2>
+                <h4>
+                  Presupuesto: €{formatStringPrice(license["LICENCIAS.budget"])}
+                </h4>
+                <h5>
+                  Desde {license["LICENCIAS.fecha_inicio"] || "N/A"} hasta{" "}
+                  {license["LICENCIAS.fecha_fin"] || "N/A"}
+                </h5>
               </div>
-            );
-          })}
+
+              <p>
+                <strong>Tipología Residencial:</strong>{" "}
+                {license["LICENCIAS.residential_typology"] || "N/A"}
+              </p>
+              <p>
+                <strong>Obra:</strong> {license["LICENCIAS.obra"] || "N/A"}
+              </p>
+              <p>
+                <strong>Fase:</strong> {license["LICENCIAS.fase"] || "N/A"}
+              </p>
+              <p>
+                <strong>Barrio:</strong> {license["LICENCIAS.barrio"] || "N/A"}
+              </p>
+              <p>
+                <strong>Distrito:</strong>{" "}
+                {license["LICENCIAS.distrito"] || "N/A"}
+              </p>
+              <p>
+                <strong>Dirección:</strong>{" "}
+                {license["LICENCIAS.dir_obra"] || "N/A"}
+              </p>
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 };
 
-export default TransactionsWidget;
+export default LicensesWidget;

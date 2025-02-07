@@ -8,6 +8,7 @@ import { humanQueryToSQL } from "@/app/utils/humanQueryToSQL";
 import { fetchOpportunities } from "../../utils/opportunities";
 import { fetchLicenses } from "@/app/utils/licenses";
 import TransactionsWidget from "@/app/components/transactions-widget";
+import LicensesWidget from "@/app/components/licenses-widget";
 
 const FunctionCalling = () => {
   const [transactionsData, setTransactionsData] = useState([]);
@@ -108,7 +109,8 @@ const FunctionCalling = () => {
       <div className={styles.container}>
         {showColumn && (
           <div className={styles.column}>
-            {transactionsData && <TransactionsWidget transactions={transactionsData} />}
+            {transactionsData.length > 0 && <TransactionsWidget transactions={transactionsData} />}
+            {licensesData.length > 0 && <LicensesWidget licenses={licensesData} />}
           </div>
         )}
 
