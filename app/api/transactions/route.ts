@@ -19,6 +19,8 @@ export async function GET(req) {
       "neighborhood",
       "seller",
       "transactiontype",
+      "final_value_min",
+      "final_value_max",
     ];
 
     optionalParams.forEach((param) => {

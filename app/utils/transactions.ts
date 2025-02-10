@@ -14,8 +14,8 @@ export async function fetchTransactions(params) {
       "neighborhood",
       "seller",
       "transactiontype",
-      "minimumvalue",
-      "maximumvalue"
+      "final_value_min",
+      "final_value_max"
     ];
 
     console.log("PARAMS", params);
